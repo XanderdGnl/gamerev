@@ -1,6 +1,12 @@
 <?php
 session_start();
+
 require_once 'connection.php';
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit;
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_id = $_SESSION['user_id'];
@@ -9,18 +15,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $content = trim($_POST['content'] ?? '');
     $rating = trim($_POST['rating'] ?? '');
 
+    if (!empty($category) && !empty($post_title) && !empty($content) && is_numeric($rating) && $rating >= 1 && $rating <= 5) {
+        try {
+            $stmt = $pdo->prepare("INSERT INTO posts (user_id, category, rating, post_title, content) VALUES (?, ?, ?, ?, ?)");
+            $stmt->execute([$user_id, $category, $rating, $post_title, $content]);
 
-    if (!empty($category) && !empty($post_title) && !empty($content)) {
-        $stmt = $pdo->prepare("INSERT INTO posts (user_id, category, rating, post_title, content) VALUES (?, ?, ?, ?, ?)");
-        $stmt->execute([$user_id, $category, $rating, $post_title, $content]);
-
-        header("Location: index.php");
-        exit;
+            header("Location: index.php");
+            exit;
+        } catch (PDOException $e) {
+            $error = "Database error: " . htmlspecialchars($e->getMessage());
+        }
     } else {
-        $error = "Vul alle velden in.";
+        $error = "Vul alle velden in en zorg dat de beoordeling tussen 1 en 5 ligt.";
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
