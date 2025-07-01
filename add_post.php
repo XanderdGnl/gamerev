@@ -2,8 +2,6 @@
 session_start();
 require_once 'connection.php';
 
-$_SESSION['user_id'] = 1;
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_id = $_SESSION['user_id'];
     $category = trim($_POST['category'] ?? '');
