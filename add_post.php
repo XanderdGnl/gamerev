@@ -1,15 +1,15 @@
 <?php
-session_start();
-
 require_once 'connection.php';
+require_once 'session.php'; 
 
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit;
-}
+requireLogin(); 
+
+$user_id = getUserId();
+
+$category = $post_title = $content = $rating = '';
+$error = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $user_id = $_SESSION['user_id'];
     $category = trim($_POST['category'] ?? '');
     $post_title = trim($_POST['post_title'] ?? '');
     $content = trim($_POST['content'] ?? '');
@@ -30,6 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
+
 
 
 <!DOCTYPE html>
